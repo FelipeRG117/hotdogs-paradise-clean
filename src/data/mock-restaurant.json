@@ -1,0 +1,280 @@
+{
+  "$schema": "./schema.json",
+  "systemConfig": {
+    "version": "3.0.0",
+    "templateEngine": {
+      "name": "TemplateMaster",
+      "version": "1.2.0",
+      "adaptableDomains": [
+        "restaurant",
+        "services",
+        "creative",
+        "ecommerce"
+      ],
+      "migrationPaths": {
+        "restaurant_to_services": "service-transformer-v2",
+        "restaurant_to_creative": "creative-transformer-v1"
+      }
+    },
+    "observability": {
+      "logging": {
+        "level": "debug",
+        "customizationEvents": true
+      },
+      "analyticsIntegration": [
+        "GA4",
+        "Hotjar",
+        "Facebook"
+      ]
+    }
+  },
+  "store": {
+    "id": "store_001",
+    "type": "restaurant",
+    "businessModel": "food_delivery",
+    "templateMetadata": {
+      "createdFrom": "template_restaurant_v3",
+      "lastAdaptation": "2025-08-06T12:00:00Z",
+      "compatibility": {
+        "services": 0.92,
+        "creative": 0.85,
+        "ecommerce": 0.78
+      }
+    },
+    "contact": {
+      "whatsapp": {
+        "businessAccount": true,
+        "messageTemplates": {
+          "orderConfirmation": "tmpl_order_confirmation_v2",
+          "deliveryUpdate": "tmpl_delivery_update_v1"
+        }
+      }
+    },
+    "settings": {
+      "customizationEngine": {
+        "type": "ingredients_and_features",
+        "realTimePreview": true,
+        "nutritionalCalculation": true,
+        "allergenTracking": true
+      }
+    }
+  },
+  "categories": [
+    {
+      "id": "cat_001",
+      "customizationConfig": {
+        "engine": "feature-based",
+        "rules": {
+          "maxIngredients": 10,
+          "maxFeatures": 5,
+          "requiredFeatures": [
+            "size",
+            "bread_type"
+          ]
+        }
+      }
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_001",
+      "name": "Sándwich Clásico",
+      "image": "/images/sandwich.jpg",
+      "basePrice": 5.99,
+      "category": "Hot Dogs",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 1.5,
+              "currency": "USD"
+            },
+            "affects": [
+              "price",
+              "nutrition",
+              "prep_time"
+            ],
+            "validation": {
+              "required": true,
+              "incompatibleWith": {
+                "bread": [
+                  "pretzel"
+                ]
+              }
+            }
+          }
+        },
+        "ingredients": {
+          "grouping": "category_based",
+          "pricingTiers": [
+            {
+              "category": "quesos",
+              "maxSelection": 3,
+              "groupDiscount": {
+                "threshold": 2,
+                "discount": 3,
+                "appliesTo": "all"
+              }
+            }
+          ]
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "customizable_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceOptions",
+            "additionalIngredients": "serviceAddOns"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_002",
+      "name": "Hot Dog Especial",
+      "image": "/images/hotdog-especial.jpg",
+      "basePrice": 7.99,
+      "category": "Hot Dogs",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 2.0,
+              "currency": "USD"
+            },
+            "affects": ["price", "nutrition"],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "premium_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_003",
+      "name": "Papas Fritas",
+      "image": "/images/papas-fritas.jpg",
+      "basePrice": 3.99,
+      "category": "Acompañamientos",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 1.0,
+              "currency": "USD"
+            },
+            "affects": ["price"],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "addon_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_004",
+      "name": "Refresco Cola",
+      "image": "/images/refresco-cola.jpg",
+      "basePrice": 2.99,
+      "category": "Bebidas",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 0.5,
+              "currency": "USD"
+            },
+            "affects": ["price"],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "beverage_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    }
+  ],
+  "verticals": {
+    "restaurant": {
+      "templateConfig": {
+        "requiredFields": [],
+        "additionalComponents": []
+      },
+      "products": [],
+      "customizationRules": {
+        "global": {
+          "maxCustomizationValue": 200,
+          "freeItemsLimit": 3,
+          "validationEngine": "template-master-v2"
+        }
+      }
+    }
+  },
+  "analytics": {
+    "customizationTracking": {
+      "popularCombinations": {
+        "storage": "aggregated",
+        "sampleRate": 0.8,
+        "retentionDays": 30
+      }
+    }
+  },
+  "templateExtensions": {
+    "services": {
+      "requiredFields": [
+        "serviceDuration",
+        "serviceType"
+      ],
+      "additionalComponents": [
+        "serviceCalendar"
+      ]
+    },
+    "creative": {
+      "requiredFields": [
+        "projectTimeline",
+        "deliverables"
+      ],
+      "additionalComponents": [
+        "portfolioGallery"
+      ]
+    }
+  }
+}
