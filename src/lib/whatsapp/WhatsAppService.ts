@@ -120,11 +120,19 @@ export class WhatsAppService {
     formData: OrderFormData,
     totals: { subtotal: number; tax: number; delivery: number; total: number }
   ): string {
+    // Información del negocio actualizada
+    const BUSINESS_INFO = {
+      name: "🌭 HotDogs Paradise",
+      phone: "+52 81 2574 0347",
+      address: "Av. Constitución 123, Centro, Monterrey, NL",
+      hours: "Lun-Dom: 10:00 AM - 10:00 PM",
+      deliveryTime: "20-30 minutos",
+      freeDeliveryMinimum: 200
+    }
+
     const isArgentina = formData.country === 'argentina'
     const timeZone = isArgentina ? 'America/Argentina/Buenos_Aires' : 'America/Mexico_City'
     const locale = isArgentina ? 'es-AR' : 'es-MX'
-    const currency = isArgentina ? 'ARS' : 'MXN'
-    const businessAddress = this.BUSINESS_ADDRESS[formData.country]
     
     const date = new Date().toLocaleString(locale, {
       timeZone,
@@ -135,40 +143,96 @@ export class WhatsAppService {
       minute: '2-digit'
     })
 
-    // ✅ MENSAJE COMPACTO para evitar límites WhatsApp
-    const message = `🌭 *NUEVO PEDIDO - ${this.BUSINESS_NAME}*
+    const time = new Date().toLocaleTimeString(locale, { 
+      timeZone,
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })
 
-👤 *INFORMACIÓN DEL CLIENTE*
-• ${formData.customerName}
-• Tel: ${formData.customerPhone}
-• ${formData.orderType === 'delivery' ? '🚚 Envío a:' : '🏪 Recoger en tienda'}${formData.orderType === 'delivery' && formData.customerAddress ? '\n• ' + formData.customerAddress : ''}${formData.notes ? '\n• Notas: ' + formData.notes : ''}
+    // ✅ MENSAJE PROFESIONAL Y ESTRUCTURADO
+    let message = `🌭 *${BUSINESS_INFO.name}*\n`
+    message += `📅 ${date.split(',')[0]} - ${time}\n`
+    message += `━━━━━━━━━━━━━━━━━━━━\n\n`
 
-🛒 *PRODUCTOS (${cartItems.length})*
-${cartItems.map((item, index) => {
-  const customizations = item.customizations ? 
-    Object.entries(item.customizations)
-      .filter(([key, value]) => value && value !== 'none')
-      .slice(0, 3) // ✅ Límite 3 customizations para reducir tamaño
-      .map(([key, value]) => `${key}: ${value}`)
-      .join(', ') : ''
-  
-  return `${index + 1}. *${item.product.name}* (${item.quantity}x)
-   $${item.totalPrice.toFixed(2)}${customizations ? '\n   ' + customizations : ''}`
-}).join('\n\n')}
+    message += `¡Hola! Me gustaría hacer el siguiente pedido:\n\n`
 
-💰 *TOTAL*
-• Subtotal: $${totals.subtotal.toFixed(2)}
-• IVA: $${totals.tax.toFixed(2)}
-• Envío: ${totals.delivery === 0 ? 'GRATIS 🎉' : '$' + totals.delivery.toFixed(2)}
-• *TOTAL: $${totals.total.toFixed(2)} MXN*
+    // Información del cliente
+    message += `👤 *INFORMACIÓN DEL CLIENTE:*\n`
+    message += `• Nombre: ${formData.customerName}\n`
+    message += `• Teléfono: ${formData.customerPhone}\n`
+    message += `• Tipo: ${formData.orderType === 'delivery' ? '🚚 Entrega a domicilio' : '🏪 Recoger en tienda'}\n`
+    
+    if (formData.customerAddress && formData.orderType === 'delivery') {
+      message += `• Dirección: ${formData.customerAddress}\n`
+    }
+    
+    if (formData.notes) {
+      message += `• Notas: ${formData.notes}\n`
+    }
+    
+    message += `\n`
 
-📍 ${this.BUSINESS_NAME}
-${this.BUSINESS_ADDRESS}
-Lun-Dom: 10:00 AM - 10:00 PM
+    // Detalles de productos
+    message += `📋 *MI PEDIDO:*\n`
+    cartItems.forEach((item, index) => {
+      message += `\n${index + 1}. *${item.product.name}*\n`
+      message += `   💰 $${item.product.basePrice.toFixed(2)} x ${item.quantity} = $${item.totalPrice.toFixed(2)}\n`
+      
+      // Agregar personalizaciones si existen
+      if (item.customizations && Object.keys(item.customizations).length > 0) {
+        message += `   🎨 *Personalización:*\n`
+        
+        if (item.customizations.size) {
+          message += `   • Tamaño: ${item.customizations.size}\n`
+        }
+        if (item.customizations.bread) {
+          message += `   • Pan: ${item.customizations.bread}\n`
+        }
+        if (item.customizations.ingredients && Array.isArray(item.customizations.ingredients) && item.customizations.ingredients.length > 0) {
+          message += `   • Extras: ${item.customizations.ingredients.join(', ')}\n`
+        }
+        if (item.customizations.sauces && Array.isArray(item.customizations.sauces) && item.customizations.sauces.length > 0) {
+          message += `   • Salsas: ${item.customizations.sauces.join(', ')}\n`
+        }
+      }
+    })
 
-🕐 Pedido: ${date}
+    // Resumen de costos
+    message += `\n━━━━━━━━━━━━━━━━━━━━\n`
+    message += `💵 *RESUMEN:*\n`
+    message += `• Subtotal: $${totals.subtotal.toFixed(2)}\n`
+    message += `• IVA (16%): $${totals.tax.toFixed(2)}\n`
+    
+    if (totals.delivery > 0) {
+      message += `• Envío: $${totals.delivery.toFixed(2)}\n`
+    } else {
+      message += `• Envío: GRATIS 🎉\n`
+    }
+    
+    message += `• *TOTAL: $${totals.total.toFixed(2)} MXN*\n\n`
 
-¡Confirma tu pedido por favor! 🌭✨`
+    // Información de entrega
+    message += `🚚 *ENTREGA:*\n`
+    message += `Por favor confirmen:\n`
+    message += `• Dirección completa ${formData.orderType === 'delivery' ? '(confirmada)' : '(recoger en tienda)'}\n`
+    message += `• Teléfono de contacto: ${formData.customerPhone}\n`
+    message += `• Forma de pago preferida\n`
+    message += `• Horario preferido de ${formData.orderType === 'delivery' ? 'entrega' : 'recolección'}\n\n`
+
+    // Notas adicionales
+    message += `📝 *NOTAS ADICIONALES:*\n`
+    message += `• Tiempo estimado: ${BUSINESS_INFO.deliveryTime}\n`
+    message += `• Entrega gratis en pedidos +$${BUSINESS_INFO.freeDeliveryMinimum}\n`
+    message += `• Aceptamos efectivo, tarjeta y transferencia\n\n`
+
+    message += `¡Gracias por elegir ${BUSINESS_INFO.name}! 🙏\n`
+    message += `Tu hot dog perfecto viene en camino 🔥\n\n`
+    
+    // Información del negocio
+    message += `📍 *${BUSINESS_INFO.name}*\n`
+    message += `${BUSINESS_INFO.address}\n`
+    message += `${BUSINESS_INFO.hours}\n`
+    message += `📞 ${BUSINESS_INFO.phone}`
 
     return message
   }
