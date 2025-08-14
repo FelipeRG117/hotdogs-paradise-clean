@@ -213,7 +213,7 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   {option.price > 0 ? (
                     <div className={`px-3 py-1 rounded-full text-sm font-bold transition-all duration-300 ${isSelected
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
@@ -229,7 +229,7 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                       ¡Gratis!
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 {isSelected && (
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-2xl animate-pulse"></div>
@@ -369,12 +369,12 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                       </div>
 
                       <div className="mt-6 pt-6 border-t-2 border-orange-200">
-                        <div className="text-center">
-                          <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">
+                        {/*  <div className="text-center">
+                          {/* <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">
                             ${totalPrice.toFixed(0)} MXN
-                          </div>
+                          </div> 
                           <div className="text-sm text-gray-600">Precio total</div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -439,7 +439,7 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                     ) : (
                       <div className="flex items-center justify-center gap-3">
                         <span className="text-2xl">🛒</span>
-                        <span>Agregar al Carrito - ${totalPrice.toFixed(0)}</span>
+                        <span>Agregar al Carrito {/* - ${totalPrice.toFixed(0)} */}</span>
                       </div>
                     )}
                   </Button>

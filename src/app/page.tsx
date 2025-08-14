@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button"
 import { CartTestButton } from "@/components/cart/CartTestButton"
 import { FlowTester } from "@/components/testing/FlowTester"
 import Link from "next/link"
+import WhatsAppMessages from "@/lib/whatsapp/optimized-messages"
 
 export default function Home() {
   const [isFlowTesterOpen, setIsFlowTesterOpen] = useState(false)
@@ -47,13 +48,15 @@ export default function Home() {
                     🍽️ Ver Productos
                   </Button>
                 </Link>
-                <Button
-                  variant="primary"
-                  vertical="restaurant"
-                  className="w-full sm:w-auto bg-orange-700 hover:bg-orange-800 hover:scale-105 transition-all duration-300 shadow-xl text-lg px-8 py-4 font-bold ring-4 ring-orange-300/30"
-                >
-                  🚀 Ordenar Ahora
-                </Button>
+                <a href={WhatsAppMessages.homeOrderNow()} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    variant="primary"
+                    vertical="restaurant"
+                    className="w-full sm:w-auto bg-orange-700 hover:bg-orange-800 hover:scale-105 transition-all duration-300 shadow-xl text-lg px-8 py-4 font-bold ring-4 ring-orange-300/30"
+                  >
+                    🚀 Ordenar Ahora
+                  </Button>
+                </a>
               </div>
 
               {/* Trust Indicators */}

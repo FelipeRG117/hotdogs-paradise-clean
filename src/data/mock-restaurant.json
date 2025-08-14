@@ -34,7 +34,7 @@
     "businessModel": "food_delivery",
     "templateMetadata": {
       "createdFrom": "template_restaurant_v3",
-      "lastAdaptation": "2025-08-06T12:00:00Z",
+      "lastAdaptation": "2025-08-14T12:00:00Z",
       "compatibility": {
         "services": 0.92,
         "creative": 0.85,
@@ -78,19 +78,20 @@
   "products": [
     {
       "id": "prod_001",
-      "name": "Sándwich Clásico",
-      "image": "/images/sandwich.jpg",
-      "basePrice": 5.99,
+      "name": "Dogo Regiomontano",
+      "image": "/images/dogo-regiomontano.jpg",
+      "basePrice": 45.00,
       "category": "Hot Dogs",
       "vertical": "restaurant",
       "templateType": "customizable_product",
+      "description": "El clásico de Monterrey con salchicha de res, bacon, queso asadero derretido, frijoles charros, aguacate, jitomate y salsa verde de la casa.",
       "customizationSchema": {
         "features": {
           "size": {
             "pricingModel": {
               "type": "absolute",
-              "value": 1.5,
-              "currency": "USD"
+              "value": 20.0,
+              "currency": "MXN"
             },
             "affects": [
               "price",
@@ -115,7 +116,7 @@
               "maxSelection": 3,
               "groupDiscount": {
                 "threshold": 2,
-                "discount": 3,
+                "discount": 5,
                 "appliesTo": "all"
               }
             }
@@ -134,21 +135,25 @@
     },
     {
       "id": "prod_002",
-      "name": "Hot Dog Especial",
-      "image": "/images/hotdog-especial.jpg",
-      "basePrice": 7.99,
+      "name": "Perra Norteña",
+      "image": "/images/perra-nortena.jpg",
+      "basePrice": 85.00,
       "category": "Hot Dogs",
       "vertical": "restaurant",
       "templateType": "customizable_product",
+      "description": "Jumbo de 30cm con arrachera asada, queso Oaxaca, guacamole, pico de gallo, chile toreado y salsa chipotle. Un clásico del norte mexicano.",
       "customizationSchema": {
         "features": {
           "size": {
             "pricingModel": {
               "type": "absolute",
-              "value": 2.0,
-              "currency": "USD"
+              "value": 30.0,
+              "currency": "MXN"
             },
-            "affects": ["price", "nutrition"],
+            "affects": [
+              "price",
+              "nutrition"
+            ],
             "validation": {
               "required": true
             }
@@ -167,21 +172,172 @@
     },
     {
       "id": "prod_003",
-      "name": "Papas Fritas",
-      "image": "/images/papas-fritas.jpg",
-      "basePrice": 3.99,
-      "category": "Acompañamientos",
+      "name": "Perro Pastor",
+      "image": "/images/perro-pastor.jpg",
+      "basePrice": 65.00,
+      "category": "Hot Dogs",
       "vertical": "restaurant",
       "templateType": "customizable_product",
+      "description": "Hot dog con carne de pastor auténtica, piña asada, cebolla morada, cilantro, salsa de pastor y un toque de limón. Sabor 100% mexicano.",
       "customizationSchema": {
         "features": {
           "size": {
             "pricingModel": {
               "type": "absolute",
-              "value": 1.0,
-              "currency": "USD"
+              "value": 25.0,
+              "currency": "MXN"
             },
-            "affects": ["price"],
+            "affects": [
+              "price",
+              "nutrition"
+            ],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "specialty_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_004",
+      "name": "Perra Cochina",
+      "image": "/images/perra-cochina.jpg",
+      "basePrice": 75.00,
+      "category": "Hot Dogs",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "description": "Especialidad yucateca en Monterrey: cochinita pibil desmenuzada, cebolla morada encurtida, habanero, aguacate y salsa de achiote.",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 25.0,
+              "currency": "MXN"
+            },
+            "affects": [
+              "price",
+              "nutrition"
+            ],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "specialty_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_005",
+      "name": "Dogo Sonorense",
+      "image": "/images/dogo-sonorense.jpg",
+      "basePrice": 55.00,
+      "category": "Hot Dogs",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "description": "Estilo Sonora con salchicha envuelta en tocino, frijoles bayos, jitomate, cebolla, jalapeños, aguacate, mayonesa y salsa de chile güero.",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 20.0,
+              "currency": "MXN"
+            },
+            "affects": [
+              "price",
+              "nutrition"
+            ],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "regional_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_006",
+      "name": "Mega Perrón de 50cm",
+      "image": "/images/mega-perron.jpg",
+      "basePrice": 125.00,
+      "category": "Hot Dogs",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "description": "¡El reto de Monterrey! 50cm de pura sabrosura con doble salchicha, chorizo, queso asadero, guacamole, frijoles charros y todas las salsas.",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 15.0,
+              "currency": "MXN"
+            },
+            "affects": [
+              "price",
+              "nutrition"
+            ],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "challenge_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_007",
+      "name": "Papas Gajo con Chile",
+      "image": "/images/papas-gajo-chile.jpg",
+      "basePrice": 35.00,
+      "category": "Acompañamientos",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "description": "Papas gajo crujientes con chile piquín, limón, queso rallado y salsa valentina. El acompañamiento perfecto estilo mexicano.",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 15.0,
+              "currency": "MXN"
+            },
+            "affects": [
+              "price"
+            ],
             "validation": {
               "required": true
             }
@@ -199,22 +355,61 @@
       }
     },
     {
-      "id": "prod_004",
-      "name": "Refresco Cola",
-      "image": "/images/refresco-cola.jpg",
-      "basePrice": 2.99,
-      "category": "Bebidas",
+      "id": "prod_008",
+      "name": "Elotes Preparados",
+      "image": "/images/elotes-preparados.jpg",
+      "basePrice": 30.00,
+      "category": "Acompañamientos",
       "vertical": "restaurant",
       "templateType": "customizable_product",
+      "description": "Elotes desgranados con mayonesa, queso cotija, chile piquín, limón y chile en polvo. Tradición mexicana en cada bocado.",
       "customizationSchema": {
         "features": {
           "size": {
             "pricingModel": {
               "type": "absolute",
-              "value": 0.5,
-              "currency": "USD"
+              "value": 10.0,
+              "currency": "MXN"
             },
-            "affects": ["price"],
+            "affects": [
+              "price"
+            ],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "traditional_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_009",
+      "name": "Coca-Cola Mexicana",
+      "image": "/images/coca-cola-mexicana.jpg",
+      "basePrice": 25.00,
+      "category": "Bebidas",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "description": "Coca-Cola mexicana de vidrio retornable de 355ml, hecha con azúcar de caña. El sabor auténtico que acompaña tu comida.",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 10.0,
+              "currency": "MXN"
+            },
+            "affects": [
+              "price"
+            ],
             "validation": {
               "required": true
             }
@@ -224,6 +419,42 @@
       "templateMappings": {
         "service": {
           "targetType": "beverage_service",
+          "fieldMappings": {
+            "customizationFeatures": "serviceFeatures",
+            "additionalIngredients": "serviceAddons"
+          }
+        }
+      }
+    },
+    {
+      "id": "prod_010",
+      "name": "Agua de Horchata",
+      "image": "/images/agua-horchata.jpg",
+      "basePrice": 30.00,
+      "category": "Bebidas",
+      "vertical": "restaurant",
+      "templateType": "customizable_product",
+      "description": "Agua fresca de horchata natural con arroz, canela, vainilla y leche condensada. Refrescante y tradicional, perfecta para el calor de Monterrey.",
+      "customizationSchema": {
+        "features": {
+          "size": {
+            "pricingModel": {
+              "type": "absolute",
+              "value": 12.0,
+              "currency": "MXN"
+            },
+            "affects": [
+              "price"
+            ],
+            "validation": {
+              "required": true
+            }
+          }
+        }
+      },
+      "templateMappings": {
+        "service": {
+          "targetType": "traditional_beverage_service",
           "fieldMappings": {
             "customizationFeatures": "serviceFeatures",
             "additionalIngredients": "serviceAddons"
@@ -241,7 +472,7 @@
       "products": [],
       "customizationRules": {
         "global": {
-          "maxCustomizationValue": 200,
+          "maxCustomizationValue": 300,
           "freeItemsLimit": 3,
           "validationEngine": "template-master-v2"
         }

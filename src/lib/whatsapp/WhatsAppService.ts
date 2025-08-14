@@ -53,7 +53,7 @@ export class WhatsAppService {
     mexico: "528125740347", // Tu número México
     argentina: "541415523886" // Tu número Argentina
   }
-  
+
   private static readonly BUSINESS_NAME = "HotDogs Paradise"
   private static readonly BUSINESS_ADDRESS = {
     mexico: "Av. Constitución 123, Centro, Monterrey, NL",
@@ -101,14 +101,14 @@ export class WhatsAppService {
    * Genera URL de WhatsApp con mensaje optimizado
    */
   static generateWhatsAppURL(
-    cartItems: CartItem[], 
+    cartItems: CartItem[],
     formData: OrderFormData,
     totals: { subtotal: number; tax: number; delivery: number; total: number }
   ): string {
     const businessPhone = this.BUSINESS_PHONES[formData.country]
     const message = this.formatOrderMessage(cartItems, formData, totals)
     const encodedMessage = this.encodeMessage(message)
-    
+
     return `https://api.whatsapp.com/send?phone=${businessPhone}&text=${encodedMessage}`
   }
 
@@ -116,7 +116,7 @@ export class WhatsAppService {
    * Formatea mensaje de pedido (versión compacta)
    */
   private static formatOrderMessage(
-    cartItems: CartItem[], 
+    cartItems: CartItem[],
     formData: OrderFormData,
     totals: { subtotal: number; tax: number; delivery: number; total: number }
   ): string {
@@ -125,7 +125,7 @@ export class WhatsAppService {
     const locale = isArgentina ? 'es-AR' : 'es-MX'
     const currency = isArgentina ? 'ARS' : 'MXN'
     const businessAddress = this.BUSINESS_ADDRESS[formData.country]
-    
+
     const date = new Date().toLocaleString(locale, {
       timeZone,
       year: 'numeric',
@@ -145,16 +145,16 @@ export class WhatsAppService {
 
 🛒 *PRODUCTOS (${cartItems.length})*
 ${cartItems.map((item, index) => {
-  const customizations = item.customizations ? 
-    Object.entries(item.customizations)
-      .filter(([key, value]) => value && value !== 'none')
-      .slice(0, 3) // ✅ Límite 3 customizations para reducir tamaño
-      .map(([key, value]) => `${key}: ${value}`)
-      .join(', ') : ''
-  
-  return `${index + 1}. *${item.product.name}* (${item.quantity}x)
+      const customizations = item.customizations ?
+        Object.entries(item.customizations)
+          .filter(([key, value]) => value && value !== 'none')
+          .slice(0, 3) // ✅ Límite 3 customizations para reducir tamaño
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ') : ''
+
+      return `${index + 1}. *${item.product.name}* (${item.quantity}x)
    $${item.totalPrice.toFixed(2)}${customizations ? '\n   ' + customizations : ''}`
-}).join('\n\n')}
+    }).join('\n\n')}
 
 💰 *TOTAL*
 • Subtotal: $${totals.subtotal.toFixed(2)}
@@ -189,7 +189,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
       .replace(/🕐/g, 'Hora:')
       .replace(/🎉/g, '')
       .replace(/✨/g, '')
-    
+
     // ✅ ENCODING seguro para WhatsApp
     return encodeURIComponent(cleanMessage)
   }
@@ -204,14 +204,14 @@ Lun-Dom: 10:00 AM - 10:00 PM
 
     // Limpiar el número (remover espacios, guiones, paréntesis)
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '')
-    
+
     // Validar formato mexicano: 10 dígitos (81 1234 5678) o con código país +52
     const mexicanPhoneRegex = /^(\+?52)?[1-9]\d{9}$/
-    
+
     if (!mexicanPhoneRegex.test(cleanPhone)) {
-      return { 
-        isValid: false, 
-        error: 'Formato inválido. Usa: 81 1234 5678 o +52 81 1234 5678' 
+      return {
+        isValid: false,
+        error: 'Formato inválido. Usa: 81 1234 5678 o +52 81 1234 5678'
       }
     }
 
@@ -228,14 +228,14 @@ Lun-Dom: 10:00 AM - 10:00 PM
 
     // Limpiar el número (remover espacios, guiones, paréntesis)
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '')
-    
+
     // Validar formato argentino: 10 dígitos (11 1234 5678) o con código país +54
     const argentinePhoneRegex = /^(\+?54)?[1-9]\d{9}$/
-    
+
     if (!argentinePhoneRegex.test(cleanPhone)) {
-      return { 
-        isValid: false, 
-        error: 'Formato inválido. Usa: 11 1234 5678 o +54 11 1234 5678' 
+      return {
+        isValid: false,
+        error: 'Formato inválido. Usa: 11 1234 5678 o +54 11 1234 5678'
       }
     }
 
@@ -246,7 +246,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
    * Valida número de teléfono según el país
    */
   static validatePhone(phone: string, country: 'mexico' | 'argentina'): { isValid: boolean; error?: string } {
-    return country === 'mexico' 
+    return country === 'mexico'
       ? this.validateMexicanPhone(phone)
       : this.validateArgentinePhone(phone)
   }
@@ -256,7 +256,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
    */
   static formatMexicanPhone(phone: string): string {
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '')
-    
+
     if (cleanPhone.startsWith('+52')) {
       return cleanPhone
     }
@@ -266,7 +266,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
     if (cleanPhone.length === 10) {
       return '+52' + cleanPhone
     }
-    
+
     return cleanPhone
   }
 
@@ -275,7 +275,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
    */
   static formatArgentinePhone(phone: string): string {
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '')
-    
+
     if (cleanPhone.startsWith('+54')) {
       return cleanPhone
     }
@@ -285,7 +285,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
     if (cleanPhone.length === 10) {
       return '+54' + cleanPhone
     }
-    
+
     return cleanPhone
   }
 
@@ -293,7 +293,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
    * Formatea número de teléfono según el país
    */
   static formatPhone(phone: string, country: 'mexico' | 'argentina'): string {
-    return country === 'mexico' 
+    return country === 'mexico'
       ? this.formatMexicanPhone(phone)
       : this.formatArgentinePhone(phone)
   }
@@ -304,7 +304,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
   static isRestaurantOpen(): boolean {
     const now = new Date()
     const currentHour = now.getHours()
-    
+
     // Restaurant hours: 10 AM to 10 PM
     return currentHour >= 10 && currentHour < 22
   }
@@ -328,7 +328,7 @@ Lun-Dom: 10:00 AM - 10:00 PM
       ...formData,
       country: formData.country || 'mexico'
     }
-    
+
     const totals = {
       subtotal: cartItems.reduce((total, item) => total + item.totalPrice, 0),
       tax: 0,

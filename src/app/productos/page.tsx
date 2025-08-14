@@ -5,6 +5,7 @@ import { ProductGrid } from '@/components/business/ProductGrid'
 import { ProductFilters } from '@/components/business/restaurant/ProductFilters'
 import { Product } from '@/types/product'
 import mockData from '@/data/mock-restaurant.json'
+import WhatsAppMessages from '@/lib/whatsapp/optimized-messages'
 
 export default function ProductosPage() {
   // State for filters
@@ -123,18 +124,35 @@ export default function ProductosPage() {
             )}
           </div>
 
-          {/* Call to Action */}
+          {/* Call to Action - UPDATED WITH WHATSAPP */}
           <div className="mt-6 pt-6 border-t border-orange-200">
             <p className="text-gray-600 mb-4">
               ¿No encuentras lo que buscas? ¡Contáctanos y creamos algo especial para ti!
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button className="bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-700 transition-colors duration-300">
-                💬 Contactar por WhatsApp
-              </button>
-              <button className="bg-white text-orange-600 border-2 border-orange-600 px-6 py-2 rounded-lg font-semibold hover:bg-orange-50 transition-colors duration-300">
-                📞 Llamar ahora
-              </button>
+              <a
+                href={WhatsAppMessages.productsContact()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block"
+              >
+                <button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+                  💬 Contactar por WhatsApp
+                </button>
+              </a>
+              <a
+                href="tel:+528125740347"
+                className="inline-block"
+              >
+                <button className="w-full sm:w-auto bg-white text-orange-600 border-2 border-orange-600 px-8 py-3 rounded-xl font-bold hover:bg-orange-50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+                  📞 Llamar Ahora
+                </button>
+              </a>
+            </div>
+
+            {/* Información adicional */}
+            <div className="mt-4 text-sm text-gray-500">
+              <p>📱 WhatsApp: +52 81 2574 0347 • 🕐 Lun-Dom 11:00 AM - 10:00 PM</p>
             </div>
           </div>
         </div>

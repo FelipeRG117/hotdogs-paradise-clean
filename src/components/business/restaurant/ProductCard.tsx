@@ -112,14 +112,14 @@ export default function ProductCard({
         </div>
 
         {/* Price Badge */}
-        <div className="absolute bottom-4 right-4">
+        {/* <div className="absolute bottom-4 right-4">
           <div className="bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg">
             <PriceDisplay
               basePrice={product.basePrice}
               customizationSchema={product.customizationSchema}
             />
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Content */}
@@ -147,15 +147,7 @@ export default function ProductCard({
           </p>
         </div>
 
-        {/* Customization Features */}
-        {product.customizationSchema?.features && (
-          <div className="mb-4 p-3 bg-orange-50 rounded-xl border border-orange-100">
-            <h4 className="text-sm font-semibold text-orange-800 mb-2 flex items-center">
-              🎨 Personalización disponible:
-            </h4>
-            {renderFeatures(product.customizationSchema.features)}
-          </div>
-        )}
+
 
         {/* Action Buttons */}
         <div className="flex gap-3">

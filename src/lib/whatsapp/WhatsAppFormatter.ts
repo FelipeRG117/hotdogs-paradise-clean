@@ -19,13 +19,13 @@ export interface OrderSummary {
 export class WhatsAppFormatter {
   private static readonly RESTAURANT_INFO = {
     name: "🌭 HotDogs Paradise",
-    phone: "+52 81 1234 5678",
+    phone: "+52 81 2574 0347",
     address: "Av. Constitución 123, Centro, Monterrey, NL",
     hours: "Lun-Dom: 10:00 AM - 10:00 PM"
   }
 
   static formatOrderMessage(
-    cartItems: CartItem[], 
+    cartItems: CartItem[],
     customerInfo: CustomerInfo,
     orderSummary: OrderSummary
   ): string {
@@ -39,21 +39,21 @@ export class WhatsAppFormatter {
     })
 
     let message = `🌭 *NUEVO PEDIDO - HotDogs Paradise*\n\n`
-    
+
     // Customer Information
     message += `👤 *INFORMACIÓN DEL CLIENTE*\n`
     message += `• Nombre: ${customerInfo.name}\n`
     message += `• Teléfono: ${customerInfo.phone}\n`
     message += `• Tipo: ${customerInfo.deliveryType === 'delivery' ? '🚚 Entrega a domicilio' : '🏪 Recoger en tienda'}\n`
-    
+
     if (customerInfo.address && customerInfo.deliveryType === 'delivery') {
       message += `• Dirección: ${customerInfo.address}\n`
     }
-    
+
     if (customerInfo.notes) {
       message += `• Notas: ${customerInfo.notes}\n`
     }
-    
+
     message += `• Fecha: ${timestamp}\n\n`
 
     // Order Items
@@ -62,7 +62,7 @@ export class WhatsAppFormatter {
       message += `\n${index + 1}. *${item.product.name}*\n`
       message += `   • Cantidad: ${item.quantity}\n`
       message += `   • Precio unitario: $${item.product.basePrice.toFixed(2)}\n`
-      
+
       // Customizations
       if (item.customizations && Object.keys(item.customizations).length > 0) {
         message += `   • Personalización:\n`
@@ -74,7 +74,7 @@ export class WhatsAppFormatter {
           }
         })
       }
-      
+
       message += `   • Subtotal: $${item.totalPrice.toFixed(2)}\n`
     })
 
@@ -82,23 +82,23 @@ export class WhatsAppFormatter {
     message += `\n💰 *RESUMEN DEL PEDIDO*\n`
     message += `• Subtotal: $${orderSummary.subtotal.toFixed(2)}\n`
     message += `• IVA (16%): $${orderSummary.tax.toFixed(2)}\n`
-    
+
     if (orderSummary.deliveryFee > 0) {
       message += `• Envío: $${orderSummary.deliveryFee.toFixed(2)}\n`
     } else {
       message += `• Envío: GRATIS ✅\n`
     }
-    
+
     message += `• *TOTAL: $${orderSummary.total.toFixed(2)} MXN*\n\n`
 
     // Instructions
     message += `📋 *INSTRUCCIONES*\n`
     message += `Por favor confirma tu pedido y tiempo estimado de ${customerInfo.deliveryType === 'delivery' ? 'entrega' : 'preparación'}.\n\n`
-    
+
     message += `🏪 *${this.RESTAURANT_INFO.name}*\n`
     message += `📍 ${this.RESTAURANT_INFO.address}\n`
     message += `🕐 ${this.RESTAURANT_INFO.hours}\n\n`
-    
+
     message += `¡Gracias por elegirnos! 🌭❤️`
 
     return message
@@ -107,13 +107,13 @@ export class WhatsAppFormatter {
   static calculateOrderSummary(cartItems: CartItem[]): OrderSummary {
     const subtotal = cartItems.reduce((total, item) => total + item.totalPrice, 0)
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0)
-    
+
     // Tax calculation (16% IVA in Mexico)
     const tax = subtotal * 0.16
-    
+
     // Delivery fee (free over $200)
     const deliveryFee = subtotal > 200 ? 0 : 35
-    
+
     // Final total
     const total = subtotal + tax + deliveryFee
 
@@ -161,14 +161,14 @@ export class WhatsAppFormatter {
   static formatPhoneNumber(phone: string): string {
     // Clean phone number
     const cleaned = phone.replace(/\D/g, '')
-    
+
     // Add Mexico country code if not present
     if (cleaned.length === 10) {
       return `+52${cleaned}`
     } else if (cleaned.length === 12 && cleaned.startsWith('52')) {
       return `+${cleaned}`
     }
-    
+
     return phone // Return original if format is unclear
   }
 }
