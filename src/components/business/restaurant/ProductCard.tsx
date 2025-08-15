@@ -1,11 +1,8 @@
 'use client'
 
-import { Product, ProductCustomization } from '@/types/product'
-import { Button, ButtonVariant } from '@/components/ui/Button'
-import { useMemo, useEffect, useState } from 'react'
-import { FeatureOption } from '@/components/ui/FeatureOption'
-import { useProductTracking } from '@/hooks/useProductAnalytics'
-import { ProductCustomizer } from '@/components/customizer/ProductCustomizer'
+import { useState } from 'react'
+import { Product } from '@/types/product'
+import { Button } from '@/components/ui/Button'
 import { useCartActions } from '@/lib/stores/cartStore'
 
 type ProductVariant = 'default' | 'compact' | 'featured'
@@ -25,102 +22,38 @@ const variantClasses: Record<ProductVariant, string> = {
     "group cursor-pointer bg-gradient-to-br from-orange-50 to-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-2 border-orange-200 hover:border-orange-300 overflow-hidden",
 }
 
-const buttonVariants: Record<ProductVariant, ButtonVariant> = {
-  default: 'primary',
-  compact: 'secondary',
-  featured: 'primary'
-}
-
 export default function ProductCard({
   product,
   variant = 'default',
   onCustomize
 }: ProductCardProps) {
-  // Inicializar tracking para este producto
-  const { trackView, trackCustomizeStart } = useProductTracking(product.id)
-
-  // Cart actions
   const { addItem } = useCartActions()
-
-  // State para el ProductCustomizer
-  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
 
-  // Detectar si es una bebida
-  const isBeverage = useMemo(() => {
-    return product.category?.toLowerCase() === 'bebidas'
-  }, [product.category])
+  // Determinar si es bebida basado en la categoría
+  const isBeverage = product.category === 'Bebidas'
 
-  // Trackear vista del producto cuando se monta el componente
-  useEffect(() => {
-    trackView()
-  }, [trackView])
-
-  // Usar customizationSchema para renderizar opciones
-  const renderFeatures = (features: ProductCustomization['features']) => (
-    <div className="space-y-2">
-      {Object.entries(features)
-        .slice(0, 3)
-        .map(([name, feature]) => (
-          <FeatureOption key={name} feature={feature} name={name} />
-        ))}
-      {Object.entries(features).length > 3 && (
-        <div className="text-xs text-orange-600 font-medium">
-          +{Object.entries(features).length - 3} opciones más
-        </div>
-      )}
-    </div>
-  )
-
-  // Asegurar que siempre tengamos un variant válido
-  const buttonVariantValue = buttonVariants[variant] || 'primary'
-
-  // Manejar click de personalización con tracking (solo para hot dogs)
-  const handleCustomizeClick = () => {
-    trackCustomizeStart()
-    setIsCustomizerOpen(true)
-    onCustomize?.(product.id)
-  }
-
-  // Manejar agregar bebida directamente al carrito
   const handleDirectAddToCart = async () => {
     if (isAdding) return
 
     setIsAdding(true)
-
     try {
-      // Agregar al carrito sin customizaciones
-      addItem(product, {})
-
-      // Feedback visual temporal
-      await new Promise(resolve => setTimeout(resolve, 500))
+      addItem(product)
+      setTimeout(() => setIsAdding(false), 1000)
     } catch (error) {
       console.error('Error adding to cart:', error)
-    } finally {
       setIsAdding(false)
     }
   }
 
-  // Manejar quick add button (corazón)
-  const handleQuickAdd = () => {
-    if (isBeverage) {
-      handleDirectAddToCart()
-    } else {
-      handleCustomizeClick()
+  const handleCustomizeClick = () => {
+    if (onCustomize) {
+      onCustomize(product.id)
     }
   }
 
-  const closeCustomizer = () => {
-    setIsCustomizerOpen(false)
-  }
-
   return (
-    <div
-      className={variantClasses[variant]}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className={variantClasses[variant]}>
       {/* Image Container */}
       <div className="relative overflow-hidden">
         <img
@@ -140,19 +73,6 @@ export default function ProductCard({
             </div>
           </div>
         )}
-
-        {/* Quick Add Button */}
-        <div className={`absolute top-4 right-4 transition-all duration-300 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-          }`}>
-          <button
-            onClick={handleQuickAdd}
-            disabled={isAdding}
-            className={`w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-orange-600 hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg ${isAdding ? 'animate-pulse' : ''
-              }`}
-          >
-            {isAdding ? '✓' : (isBeverage ? '🛒' : '❤️')}
-          </button>
-        </div>
 
         {/* Price Badge */}
         <div className="absolute bottom-4 right-4">
@@ -203,7 +123,7 @@ export default function ProductCard({
                   ? 'bg-green-500 hover:bg-green-600 text-white'
                   : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
                   }`}
-                variant={buttonVariantValue}
+                variant="primary"
                 vertical="restaurant"
               >
                 {isAdding ? '✓ Agregado' : '🛒 Agregar al Carrito'}
@@ -215,7 +135,7 @@ export default function ProductCard({
               <Button
                 onClick={handleCustomizeClick}
                 className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-                variant={buttonVariantValue}
+                variant="primary"
                 vertical="restaurant"
               >
                 🎨 Personalizar
@@ -250,48 +170,6 @@ export default function ProductCard({
           )}
         </div>
       </div>
-
-      {/* ProductCustomizer Modal - Solo para hot dogs */}
-      {!isBeverage && (
-        <ProductCustomizer
-          product={product}
-          isOpen={isCustomizerOpen}
-          onClose={closeCustomizer}
-        />
-      )}
-    </div>
-  )
-}
-
-// Componente auxiliar mejorado con mejor styling
-function PriceDisplay({
-  basePrice,
-  customizationSchema
-}: {
-  basePrice: number
-  customizationSchema?: Product['customizationSchema']
-}) {
-  const minCustomPrice = useMemo(() => {
-    if (!customizationSchema?.features) return 0
-    return Object.values(customizationSchema.features)
-      .reduce((acc, feature) => {
-        const price = feature.pricingModel.value
-        return acc + (feature.pricingModel.type === 'relative'
-          ? basePrice * (price / 100)
-          : price)
-      }, 0)
-  }, [customizationSchema, basePrice])
-
-  return (
-    <div className="text-center">
-      <div className="text-lg font-bold text-orange-600">
-        ${basePrice.toFixed(0)}
-      </div>
-      {minCustomPrice > 0 && (
-        <div className="text-xs text-gray-500">
-          +${minCustomPrice.toFixed(0)} custom
-        </div>
-      )}
     </div>
   )
 }

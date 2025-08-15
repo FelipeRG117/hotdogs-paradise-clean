@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { ProductGrid } from '@/components/business/ProductGrid'
 import { ProductFilters } from '@/components/business/restaurant/ProductFilters'
+import { ProductCustomizer } from '@/components/customizer/ProductCustomizer'
 import { Product } from '@/types/product'
 import mockData from '@/data/mock-restaurant.json'
 import WhatsAppMessages from '@/lib/whatsapp/optimized-messages'
@@ -12,6 +13,8 @@ import Link from 'next/link'
 export default function ProductosPage() {
   // State for filters
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [isProductCustomizerOpen, setIsProductCustomizerOpen] = useState(false)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
 
   // Extraer productos del mock data con type assertion
   const allProducts = (mockData.products || []) as Product[]
@@ -128,7 +131,8 @@ export default function ProductosPage() {
                 variant="grid"
                 cardVariant="featured"
                 onProductCustomize={(productId) => {
-                  console.log("Customizar producto:", productId)
+                  setSelectedProductId(productId)
+                  setIsProductCustomizerOpen(true)
                 }}
               />
             )}
@@ -201,6 +205,16 @@ export default function ProductosPage() {
         </footer>
        
       </main>
+
+
+      {/* ProductCustomizer Modal */}
+      {isProductCustomizerOpen && selectedProductId && (
+        <ProductCustomizer
+          product={mockData.products.find(p => p.id === selectedProductId) || null}
+          isOpen={isProductCustomizerOpen}
+          onClose={() => setIsProductCustomizerOpen(false)}
+        />
+      )}
     </div>
   )
 }

@@ -57,11 +57,6 @@ const CUSTOMIZATION_OPTIONS = {
   ]
 }
 
-/*  // Fallback to emoji if image fails to load
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                          target.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-6xl">🌭</div>' */
-
 export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomizerProps) {
   const { addItem } = useCartActions()
 
@@ -73,13 +68,12 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
   })
 
   const [isAdding, setIsAdding] = useState(false)
+  const [showCustomizationDetails, setShowCustomizationDetails] = useState(false)
 
   // Calculate total price including customizations
   const totalPrice = useMemo(() => {
     if (!product) return 0
-
     let price = product.basePrice
-
     // Add size price
     const sizeOption = CUSTOMIZATION_OPTIONS.sizes.find(s => s.id === customizations.size)
     if (sizeOption) price += sizeOption.price
@@ -93,7 +87,6 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
       const ingredient = CUSTOMIZATION_OPTIONS.ingredients.find(i => i.id === ingredientId)
       if (ingredient) price += ingredient.price
     })
-
     // Add sauces price
     customizations.sauces.forEach(sauceId => {
       const sauce = CUSTOMIZATION_OPTIONS.sauces.find(s => s.id === sauceId)
@@ -105,13 +98,10 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
 
   const handleAddToCart = async () => {
     if (!product) return
-
     setIsAdding(true)
-
     try {
       // Add customized product to cart
       addItem(product, customizations)
-
       // Success feedback
       setTimeout(() => {
         setIsAdding(false)
@@ -137,111 +127,6 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
     }))
   }
 
-  // Helper function for option selection
-  const renderOptionSelector = (
-    title: string,
-    type: 'radio' | 'checkbox',
-    options: Option[],
-    selected: string | string[],
-    onChange: (value: string | string[]) => void,
-    required = false
-  ) => {
-    const handleRadioChange = (optionId: string) => {
-      if (type === 'radio') {
-        onChange(optionId)
-      }
-    }
-
-    const handleCheckboxChange = (optionId: string) => {
-      if (type === 'checkbox') {
-        const currentSelected = selected as string[]
-        const isSelected = currentSelected.includes(optionId)
-
-        if (isSelected) {
-          if (required && currentSelected.length === 1) return
-          onChange(currentSelected.filter(id => id !== optionId))
-        } else {
-          onChange([...currentSelected, optionId])
-        }
-      }
-    }
-
-    const isOptionSelected = (optionId: string) => {
-      return type === 'radio' ? selected === optionId : (selected as string[]).includes(optionId)
-    }
-
-    return (
-      <div className="space-y-4">
-        <h4 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-          <span className="text-2xl">🎨</span>
-          {title}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </h4>
-        <div className="grid grid-cols-1 gap-3">
-          {options.map((option) => {
-            const isSelected = isOptionSelected(option.id)
-
-            return (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() =>
-                  type === 'radio'
-                    ? handleRadioChange(option.id)
-                    : handleCheckboxChange(option.id)
-                }
-                className={`group relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${isSelected
-                  ? 'border-orange-500 bg-gradient-to-r from-orange-50 to-red-50 text-orange-900 shadow-lg ring-4 ring-orange-200/50'
-                  : 'border-gray-200 bg-white text-gray-900 hover:border-orange-300 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/50 shadow-md hover:shadow-lg'
-                  }`}
-              >
-                <div className="flex items-center space-x-4">
-                  <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 transition-all duration-300 ${isSelected
-                    ? 'border-orange-500 bg-gradient-to-br from-orange-500 to-red-500 shadow-lg'
-                    : 'border-gray-300 group-hover:border-orange-400'
-                    }`}>
-                    {isSelected && (
-                      <CheckIcon className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
-                      {option.emoji}
-                    </span>
-                    <span className="text-sm font-semibold">{option.name}</span>
-                  </div>
-                </div>
-
-                {/* <div className="flex items-center space-x-2">
-                  {option.price > 0 ? (
-                    <div className={`px-3 py-1 rounded-full text-sm font-bold transition-all duration-300 ${isSelected
-                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-600 group-hover:bg-orange-100 group-hover:text-orange-600'
-                      }`}>
-                      +${option.price.toFixed(0)}
-                    </div>
-                  ) : (
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${isSelected
-                      ? 'bg-green-500 text-white shadow-lg'
-                      : 'bg-green-100 text-green-600 group-hover:bg-green-200'
-                      }`}>
-                      ¡Gratis!
-                    </div>
-                  )}
-                </div> */}
-
-                {isSelected && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-2xl animate-pulse"></div>
-                )}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
   if (!product) return null
 
   return (
@@ -249,203 +134,387 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
       <Dialog as="div" className="relative z-50" onClose={onClose}>
         <Transition.Child
           as={Fragment}
-          enter="ease-out duration-300"
+          enter="ease-in-out duration-500"
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-200"
+          leave="ease-in-out duration-500"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity" />
         </Transition.Child>
 
-        <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              enterTo="opacity-100 translate-y-0 sm:scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-6xl">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-orange-600 to-red-500 px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+        <div className="fixed inset-0 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex w-full lg:w-1/2 pl-0">
+              <Transition.Child
+                as={Fragment}
+                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enterFrom="translate-x-full"
+                enterTo="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leaveFrom="translate-x-0"
+                leaveTo="translate-x-full"
+              >
+                <Dialog.Panel className="pointer-events-auto w-full h-full">
+                  <div className="h-full w-full flex flex-col bg-white shadow-2xl border-l-2 border-orange-500">
+                    {/* Header del Drawer - FIJO */}
+                    <div className="bg-gradient-to-r from-orange-600 to-red-500 w-full flex items-center justify-between px-4 py-3 text-white flex-shrink-0">
+                      <div className="flex items-center gap-3">
                         <span className="text-2xl">🎨</span>
+                        <div>
+                          <h3 className="font-bold text-lg">
+                            Personaliza tu {product.name}
+                          </h3>
+                          <p className="text-orange-100 text-sm">
+                            Crea tu hot dog perfecto
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-left">
-                        <Dialog.Title as="h3" className="text-2xl font-bold text-white">
-                          Personaliza tu {product.name}
-                        </Dialog.Title>
-                        <p className="text-orange-100">
-                          Crea tu hot dog perfecto con nuestras opciones premium
-                        </p>
-                      </div>
+                      <button
+                        onClick={onClose}
+                        className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all hover:scale-105"
+                      >
+                        <XMarkIcon className="h-5 w-5" />
+                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110"
-                      onClick={onClose}
-                    >
-                      <XMarkIcon className="h-6 w-6" />
-                    </button>
-                  </div>
-                </div>
+                    {/* Contenido SCROLLEABLE */}
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden touch-pan-y">
+                      <div className="px-3 py-4 lg:px-4 lg:py-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                          
+                          {/* Columna 1: Opciones de Personalización */}
+                          <div className="order-2 lg:order-1">
+                            <div className="bg-white rounded-2xl p-4 border-2 border-orange-200 shadow-lg">
+                              <div className="space-y-6">
+                                
+                                {/* Tamaño de pan */}
+                                <div className="space-y-3">
+                                  <h5 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                                    <span className="text-lg">🌭</span>
+                                    Tamaño de pan
+                                  </h5>
+                                  <div className="space-y-2">
+                                    {CUSTOMIZATION_OPTIONS.sizes.map((option) => {
+                                      const isSelected = customizations.size === option.id
+                                      return (
+                                        <button
+                                          key={option.id}
+                                          type="button"
+                                          onClick={() => updateCustomization('size', option.id)}
+                                          className={`w-full group relative flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 ${isSelected
+                                            ? 'border-orange-500 bg-gradient-to-r from-orange-50 to-red-50 text-orange-900 shadow-lg ring-2 ring-orange-200/50'
+                                            : 'border-gray-200 bg-white text-gray-900 hover:border-orange-300 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/50 shadow-md hover:shadow-lg'
+                                            }`}
+                                        >
+                                          <div className="flex items-center space-x-3">
+                                            <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-all duration-300 ${isSelected
+                                              ? 'border-orange-500 bg-gradient-to-br from-orange-500 to-red-500 shadow-lg'
+                                              : 'border-gray-300 group-hover:border-orange-400'
+                                              }`}>
+                                              {isSelected && (
+                                                <CheckIcon className="w-3 h-3 text-white" />
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-lg">
+                                                {option.emoji}
+                                              </span>
+                                              <span className="text-sm font-semibold">{option.name}</span>
+                                            </div>
+                                          </div>
+                                          <div className="text-sm font-bold text-gray-600">
+                                            {option.price > 0 ? `+$${option.price}` : 'Gratis'}
+                                          </div>
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
 
-                {/* Content */}
-                <div className="flex flex-col lg:flex-row">
-                  {/* Product Preview - Left Side */}
-                  <div className="lg:w-2/5 p-6 bg-gradient-to-br from-orange-50 to-red-50">
-                    {/* Product Image */}
-                    <div className="relative w-full h-80 bg-white rounded-2xl overflow-hidden shadow-xl mb-6 group">
-                      <Image
-                        src={product.image || "/placeholder.svg"}
-                        alt={product.name}
-                        width={400}
-                        height={320}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        onError={(e) => {
+                                {/* Tipo de Pan */}
+                                <div className="space-y-3">
+                                  <h5 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                                    <span className="text-lg">🍞</span>
+                                    Tipo de Pan
+                                  </h5>
+                                  <div className="space-y-2">
+                                    {CUSTOMIZATION_OPTIONS.breads.map((option) => {
+                                      const isSelected = customizations.bread === option.id
+                                      return (
+                                        <button
+                                          key={option.id}
+                                          type="button"
+                                          onClick={() => updateCustomization('bread', option.id)}
+                                          className={`w-full group relative flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 ${isSelected
+                                            ? 'border-orange-500 bg-gradient-to-r from-orange-50 to-red-50 text-orange-900 shadow-lg ring-2 ring-orange-200/50'
+                                            : 'border-gray-200 bg-white text-gray-900 hover:border-orange-300 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/50 shadow-md hover:shadow-lg'
+                                            }`}
+                                        >
+                                          <div className="flex items-center space-x-3">
+                                            <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-all duration-300 ${isSelected
+                                              ? 'border-orange-500 bg-gradient-to-br from-orange-500 to-red-500 shadow-lg'
+                                              : 'border-gray-300 group-hover:border-orange-400'
+                                              }`}>
+                                              {isSelected && (
+                                                <CheckIcon className="w-3 h-3 text-white" />
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-lg">
+                                                {option.emoji}
+                                              </span>
+                                              <span className="text-sm font-semibold">{option.name}</span>
+                                            </div>
+                                          </div>
+                                          <div className="text-sm font-bold text-gray-600">
+                                            {option.price > 0 ? `+$${option.price}` : 'Gratis'}
+                                          </div>
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
 
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
+                                {/* Ingredientes Adicionales */}
+                                <div className="space-y-3">
+                                  <h5 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                                    <span className="text-lg">🧀</span>
+                                    Ingredientes Adicionales
+                                  </h5>
+                                  <div className="space-y-2">
+                                    {CUSTOMIZATION_OPTIONS.ingredients.map((option) => {
+                                      const isSelected = customizations.ingredients.includes(option.id)
+                                      return (
+                                        <button
+                                          key={option.id}
+                                          type="button"
+                                          onClick={() => {
+                                            const currentSelected = customizations.ingredients
+                                            if (isSelected) {
+                                              updateCustomization('ingredients', currentSelected.filter(id => id !== option.id))
+                                            } else {
+                                              updateCustomization('ingredients', [...currentSelected, option.id])
+                                            }
+                                          }}
+                                          className={`w-full group relative flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 ${isSelected
+                                            ? 'border-orange-500 bg-gradient-to-r from-orange-50 to-red-50 text-orange-900 shadow-lg ring-2 ring-orange-200/50'
+                                            : 'border-gray-200 bg-white text-gray-900 hover:border-orange-300 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/50 shadow-md hover:shadow-lg'
+                                            }`}
+                                        >
+                                          <div className="flex items-center space-x-3">
+                                            <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-all duration-300 ${isSelected
+                                              ? 'border-orange-500 bg-gradient-to-r from-orange-500 to-red-500 shadow-lg'
+                                              : 'border-gray-300 group-hover:border-orange-400'
+                                              }`}>
+                                              {isSelected && (
+                                                <CheckIcon className="w-3 h-3 text-white" />
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-lg">
+                                                {option.emoji}
+                                              </span>
+                                              <span className="text-sm font-semibold">{option.name}</span>
+                                            </div>
+                                          </div>
+                                          <div className="text-sm font-bold text-gray-600">
+                                            +${option.price}
+                                          </div>
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
 
-                    {/* Customization Preview */}
-                    <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-orange-200">
-                      <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <span className="text-2xl">✨</span>
-                        Tu Personalización
-                      </h4>
+                                {/* Salsas */}
+                                <div className="space-y-3">
+                                  <h5 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                                    <span className="text-lg">🍅</span>
+                                    Salsas
+                                    <span className="text-red-500 ml-1">*</span>
+                                  </h5>
+                                  <div className="space-y-2">
+                                    {CUSTOMIZATION_OPTIONS.sauces.map((option) => {
+                                      const isSelected = customizations.sauces.includes(option.id)
+                                      return (
+                                        <button
+                                          key={option.id}
+                                          type="button"
+                                          onClick={() => {
+                                            const currentSelected = customizations.sauces
+                                            if (isSelected && currentSelected.length > 1) {
+                                              updateCustomization('sauces', currentSelected.filter(id => id !== option.id))
+                                            } else if (!isSelected) {
+                                              updateCustomization('sauces', [...currentSelected, option.id])
+                                            }
+                                          }}
+                                          className={`w-full group relative flex items-center justify-between p-3 rounded-xl border-2 transition-all duration-300 ${isSelected
+                                            ? 'border-orange-500 bg-gradient-to-r from-orange-50 to-red-50 text-orange-900 shadow-lg ring-2 ring-orange-200/50'
+                                            : 'border-gray-200 bg-white text-gray-900 hover:border-orange-300 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/50 shadow-md hover:shadow-lg'
+                                            }`}
+                                        >
+                                          <div className="flex items-center space-x-3">
+                                            <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-all duration-300 ${isSelected
+                                              ? 'border-orange-500 bg-gradient-to-br from-orange-500 to-red-500 shadow-lg'
+                                              : 'border-gray-300 group-hover:border-orange-400'
+                                              }`}>
+                                              {isSelected && (
+                                                <CheckIcon className="w-3 h-3 text-white" />
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-lg">
+                                                {option.emoji}
+                                              </span>
+                                              <span className="text-sm font-semibold">{option.name}</span>
+                                            </div>
+                                          </div>
+                                          <div className="text-sm font-bold text-gray-600">
+                                            {option.price > 0 ? `+$${option.price}` : 'Gratis'}
+                                          </div>
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
 
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl">
-                          <span className="text-orange-800 font-medium">Tamaño:</span>
-                          <span className="font-bold text-orange-600">{customizations.size}</span>
-                        </div>
-
-                        <div className="flex justify-between items-center p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl">
-                          <span className="text-orange-800 font-medium">Pan:</span>
-                          <span className="font-bold text-orange-600">{customizations.bread}</span>
-                        </div>
-
-                        {customizations.ingredients.length > 0 && (
-                          <div className="p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl">
-                            <span className="text-orange-800 font-medium block mb-2">Extras:</span>
-                            <div className="flex flex-wrap gap-2">
-                              {customizations.ingredients.map((ing) => (
-                                <span
-                                  key={ing}
-                                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
-                                >
-                                  {ing}
-                                </span>
-                              ))}
+                              </div>
                             </div>
                           </div>
-                        )}
 
-                        {customizations.sauces.length > 0 && (
-                          <div className="p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl">
-                            <span className="text-orange-800 font-medium block mb-2">Salsas:</span>
-                            <div className="flex flex-wrap gap-2">
-                              {customizations.sauces.map((sauce) => (
-                                <span
-                                  key={sauce}
-                                  className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
+                          {/* Columna 2: Vista Previa y Resumen */}
+                          <div className="order-1 lg:order-2">
+                            <div className="space-y-4 lg:sticky lg:top-0">
+                              
+                              {/* Vista Previa del Producto */}
+                              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 border-2 border-orange-200">
+                                <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                  <span className="text-xl">🎨</span>
+                                  Vista Previa
+                                </h4>
+
+                                <div className="relative w-full h-32 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl overflow-hidden shadow-xl mb-4 group">
+                                  <Image
+                                    src={product.image || "/placeholder.svg"}
+                                    alt={product.name}
+                                    width={400}
+                                    height={320}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    onError={(e) => {
+                                      
+                                    }}
+                                  />
+                                </div>
+
+                                <div className="text-center">
+                                  <h5 className="font-bold text-base text-gray-900 mb-1">{product.name}</h5>
+                                  <p className="text-xs text-gray-600">Personalizado a tu gusto</p>
+                                </div>
+                              </div>
+
+                              {/* Resumen de Personalización */}
+                              <div className="bg-white rounded-2xl p-4 border-2 border-orange-200 shadow-lg">
+                                <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                  <span className="text-xl">✨</span>
+                                  Tu Personalización
+                                </h4>
+
+                                <button
+                                  onClick={() => setShowCustomizationDetails(!showCustomizationDetails)}
+                                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 px-4 rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg flex items-center justify-center gap-2"
                                 >
-                                  {sauce}
-                                </span>
-                              ))}
+                                  <span className="text-lg">👁️</span>
+                                  {showCustomizationDetails ? 'Ocultar Detalles' : 'Ver Detalles'}
+                                </button>
+
+                                {showCustomizationDetails && (
+                                  <div className="mt-4 space-y-3">
+                                    <div className="flex justify-between items-center p-3 bg-orange-50 rounded-xl border border-orange-200">
+                                      <span className="text-orange-800 font-medium text-sm">Tamaño:</span>
+                                      <span className="font-bold text-orange-600 text-sm bg-white px-3 py-1 rounded-full shadow-sm">
+                                        {customizations.size}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center p-3 bg-orange-50 rounded-xl border border-orange-200">
+                                      <span className="text-orange-800 font-medium text-sm">Pan:</span>
+                                      <span className="font-bold text-orange-600 text-sm bg-white px-3 py-1 rounded-full shadow-sm">
+                                        {customizations.bread}
+                                      </span>
+                                    </div>
+
+                                    {customizations.ingredients.length > 0 && (
+                                      <div className="p-3 bg-orange-50 rounded-xl border border-orange-200">
+                                        <span className="text-orange-800 font-medium block mb-2 text-sm">Ingredientes Extras:</span>
+                                        <div className="flex flex-wrap gap-2">
+                                          {customizations.ingredients.map((ing) => (
+                                            <span key={ing} className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                              {ing}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {customizations.sauces.length > 0 && (
+                                      <div className="p-3 bg-orange-50 rounded-xl border border-orange-200">
+                                        <span className="text-orange-800 font-medium block mb-2 text-sm">Salsas Seleccionadas:</span>
+                                        <div className="flex flex-wrap gap-2">
+                                          {customizations.sauces.map((sauce) => (
+                                            <span key={sauce} className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                              {sauce}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+
                             </div>
                           </div>
+
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer FIJO con precio y botón */}
+                    <div className="bg-gradient-to-r from-orange-600 to-red-500 p-4 text-white flex-shrink-0 border-t-2 border-orange-400">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <div className="text-orange-100 text-sm">Precio Total:</div>
+                          <div className="text-2xl font-bold">${totalPrice.toFixed(0)}</div>
+                        </div>
+                      </div>
+
+                      <Button
+                        variant="primary"
+                        vertical="restaurant"
+                        onClick={handleAddToCart}
+                        disabled={isAdding}
+                        className="w-full bg-white text-orange-600 hover:bg-orange-50 font-bold text-base py-3 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      >
+                        {isAdding ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600"></div>
+                            <span>Agregando...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="text-xl">🛒</span>
+                            <span>Agregar al Carrito</span>
+                          </div>
                         )}
-                      </div>
-
-                      <div className="mt-6 pt-6 border-t-2 border-orange-200">
-                        {/*  <div className="text-center">
-                          {/* <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">
-                            ${totalPrice.toFixed(0)} MXN
-                          </div> 
-                          <div className="text-sm text-gray-600">Precio total</div>
-                        </div> */}
-                      </div>
+                      </Button>
                     </div>
+
                   </div>
-
-                  {/* Customization Options - Right Side */}
-                  <div className="lg:w-3/5 p-6 max-h-[80vh] overflow-y-auto">
-                    <div className="space-y-8">
-                      {/* Size Selection */}
-                      {renderOptionSelector(
-                        "Tamaño",
-                        "radio",
-                        CUSTOMIZATION_OPTIONS.sizes,
-                        customizations.size,
-                        (value) => updateCustomization('size', value as string)
-                      )}
-
-                      {/* Bread Selection */}
-                      {renderOptionSelector(
-                        "Tipo de Pan",
-                        "radio",
-                        CUSTOMIZATION_OPTIONS.breads,
-                        customizations.bread,
-                        (value) => updateCustomization('bread', value as string)
-                      )}
-
-                      {/* Ingredients Selection */}
-                      {renderOptionSelector(
-                        "Ingredientes Adicionales",
-                        "checkbox",
-                        CUSTOMIZATION_OPTIONS.ingredients,
-                        customizations.ingredients,
-                        (value) => updateCustomization('ingredients', value as string[])
-                      )}
-
-                      {/* Sauces Selection */}
-                      {renderOptionSelector(
-                        "Salsas",
-                        "checkbox",
-                        CUSTOMIZATION_OPTIONS.sauces,
-                        customizations.sauces,
-                        (value) => updateCustomization('sauces', value as string[]),
-                        true
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="bg-gradient-to-r from-gray-50 to-orange-50 px-6 py-4 border-t-2 border-orange-200">
-                  <Button
-                    variant="primary"
-                    vertical="restaurant"
-                    onClick={handleAddToCart}
-                    disabled={isAdding}
-                    className="w-full bg-gradient-to-r from-orange-600 to-red-500 hover:from-orange-700 hover:to-red-600 text-white font-bold text-xl py-4 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  >
-                    {isAdding ? (
-                      <div className="flex items-center justify-center gap-3">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                        <span>Agregando...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-3">
-                        <span className="text-2xl">🛒</span>
-                        <span>Agregar al Carrito {/* - ${totalPrice.toFixed(0)} */}</span>
-                      </div>
-                    )}
-                  </Button>
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
           </div>
         </div>
       </Dialog>
