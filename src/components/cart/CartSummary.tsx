@@ -25,13 +25,13 @@ export function CartSummary() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-1">
       {/* Items Summary */}
       <div className="flex justify-between text-sm text-gray-600">
         <span>
-          {itemCount} {itemCount === 1 ? 'producto' : 'productos'}
+          Productos({itemCount})
         </span>
-        <span>Subtotal</span>
+       
       </div>
 
       {/* Subtotal */}
@@ -66,6 +66,7 @@ export function CartSummary() {
       </div>
 
       {/* Free Delivery Promotion */}
+      {/*
       {subtotal < 200 && subtotal > 0 && (
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
           <p className="text-xs text-orange-800">
@@ -75,7 +76,7 @@ export function CartSummary() {
       )}
 
       {/* Divider */}
-      <div className="border-t border-gray-200 pt-3">
+      <div className="border-t border-gray-200">
         <div className="flex justify-between">
           <span className="text-base font-medium text-gray-900">Total</span>
           <span className="text-lg font-bold text-orange-600">

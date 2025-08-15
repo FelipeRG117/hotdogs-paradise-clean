@@ -220,11 +220,14 @@ export function WhatsAppCheckout({ isOpen, onClose }: WhatsAppCheckoutProps) {
                   {step === 'info' && (
                     <div>
                       <div className="text-center mb-8">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3 flex items-center justify-center gap-3">
+                        <div>
+                        <span  className="text-2xl font-bold text-gray-900 mb-3 flex items-center justify-center gap-3">
                           <span className="text-3xl">👤</span>
-                          Información de Contacto
-                        </h3>
-                        <p className="text-gray-600">Completa tus datos para procesar el pedido</p>
+                          
+                        </span >
+                        <span>Información de Contacto</span>  
+                        <span className="text-gray-600">Completa tus datos para procesar el pedido</span>
+                        </div>
                       </div>
 
                       <div className="space-y-6">

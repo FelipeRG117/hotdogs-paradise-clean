@@ -37,12 +37,16 @@ export function ProductFilters({
     return (
         <div className="bg-white rounded-2xl shadow-lg border-0 overflow-hidden mb-4 md:mb-6">
             {/* Compact Header - Always Visible on ALL devices */}
-            <div className="p-4 md:p-6">
+            <div className="p-4 md:p-6 flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
                             <span className="text-white text-sm md:text-lg">🔍</span>
                         </div>
+
+
+
+
                         <div>
                             <h3 className="text-lg md:text-xl font-bold text-gray-900">Filtros</h3>
                             <p className="text-xs md:text-sm text-gray-600">
@@ -65,12 +69,16 @@ export function ProductFilters({
                                 )}
                             </p>
                         </div>
+
+
+
+
                     </div>
 
                     {/* Toggle Button - NOW VISIBLE ON ALL DEVICES */}
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+                        className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
                     >
                         <span className="text-sm md:text-base font-bold transform transition-transform duration-300">
                             {isExpanded ? '✕' : '⚙️'}
@@ -79,8 +87,9 @@ export function ProductFilters({
                 </div>
 
                 {/* Quick Category Pills - ALWAYS VISIBLE on ALL devices */}
-                <div className="mt-4">
-                    <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex flex-row items-center justify-between">
+
+                    <div className="flex flex-wrap gap-2">
                         {/* All Products Pill */}
                         <button
                             onClick={() => onCategoryChange('')}
@@ -93,7 +102,7 @@ export function ProductFilters({
                             Todos
                         </button>
 
-                        {/* Category Pills - FIXED: Use state instead of window */}
+                        {/* Category Pills - Limited to visible space */}
                         {categories.slice(0, maxCategories).map((category) => {
                             const emoji = getCategoryEmoji(category)
                             const isSelected = selectedCategory === category
@@ -112,37 +121,38 @@ export function ProductFilters({
                                 </button>
                             )
                         })}
-
-                        {/* More indicator - FIXED: Use state */}
-                        {categories.length > maxCategories && (
-                            <button
-                                onClick={() => setIsExpanded(true)}
-                                className="flex-shrink-0 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium bg-gray-200 text-gray-600 hover:bg-orange-100 hover:text-orange-600 transition-all duration-300"
-                            >
-                                +{categories.length - maxCategories}
-                            </button>
-                        )}
                     </div>
-                </div>
 
-                {/* Clear Filter Button - Compact */}
-                {selectedCategory && (
-                    <div className="mt-3">
+                    {/* Three Dots Menu - Only when there are more categories */}
+                    {categories.length > maxCategories && (
+                        <button
+                            onClick={() => setIsExpanded(true)}
+                            className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800 rounded-lg md:rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-sm"
+                            title="Ver más filtros"
+                        >
+                            <span className="text-sm md:text-base">⋯</span>
+                        </button>
+                    )}
+
+                    {/* Clear Filter Button - Compact */}
+                    {selectedCategory && (
                         <button
                             onClick={() => onCategoryChange('')}
-                            className="flex items-center gap-2 text-xs md:text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-300"
+                            className="flex-shrink-0 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 transition-all duration-300 flex items-center gap-2"
                         >
                             <span className="text-sm">🗑️</span>
-                            Limpiar Filtro
+                            <span className="hidden md:inline">Limpiar</span>
                         </button>
-                    </div>
-                )}
+                    )}
+                </div>
+
+
             </div>
 
             {/* Expanded Filters Content - Hidden by DEFAULT on ALL devices */}
             <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
                 }`}>
-                <div className="p-4 md:p-6 pt-0 border-t border-gray-100">
+                <div className="p-6 md:p-8 pt-0 border-t border-gray-100">
                     <div className="space-y-6">
                         {/* Full Category Grid - When Expanded */}
                         <div>
@@ -211,24 +221,7 @@ export function ProductFilters({
 
                         {/* Additional Filters */}
                         <div className="grid md:grid-cols-3 gap-6 pt-6 border-t border-gray-100">
-                            {/* Price Range */}
-                            <div>
-                                <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                    <span className="text-lg">💰</span>
-                                    Rango de Precio
-                                </h4>
-                                <div className="space-y-2">
-                                    {['$40-$60', '$61-$80', '$81+'].map((range) => (
-                                        <button
-                                            key={range}
-                                            className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200"
-                                        >
-                                            {range}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
+                          
                             {/* Preparation Time */}
                             <div>
                                 <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -274,7 +267,7 @@ export function ProductFilters({
                                         onCategoryChange('')
                                         setIsExpanded(false)
                                     }}
-                                    className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 font-medium bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                                    className="flex items-center gap-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105"
                                 >
                                     <span className="text-lg">🗑️</span>
                                     Limpiar Todos los Filtros

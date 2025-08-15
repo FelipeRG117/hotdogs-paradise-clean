@@ -25,8 +25,8 @@ export function CartItem({ item }: CartItemProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-200">
-      <div className="space-y-3">
+    <div className="bg-white p-3 sm:p-4 hover:shadow-xl transition-all duration-300 border-b-2 border-gradient-to-r from-orange-200 to-red-200">
+      <div className="">
         {/* Header Row - Product info and remove button */}
         <div className="flex items-start gap-3">
           {/* Product Image - Smaller on mobile */}
@@ -49,17 +49,19 @@ export function CartItem({ item }: CartItemProps) {
           {/* Product Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
-              <h4 className="text-sm sm:text-base font-bold text-gray-900 leading-tight">{item.product.name}</h4>
+              <h4 className="px-2 w-full bg-orange-500 text-white text-sm sm:text-base font-bold text-gray-900 leading-tight">{item.product.name}</h4>
 
-              {/* Remove Button - Smaller on mobile */}
-              <button
+             
+            </div>
+
+             {/* Remove Button - Smaller on mobile */}
+             <button
                 onClick={handleRemove}
-                className="w-7 h-7 sm:w-8 sm:h-8 bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-sm"
+                className="text-red-500 hover:text-red-600"
                 title="Eliminar"
               >
-                <TrashIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                🗑️ Eliminar 
               </button>
-            </div>
 
             {/* Price */}
             <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent mt-1">
