@@ -1,11 +1,13 @@
 import { CartItem } from '@/lib/stores/cartStore'
 
 export interface CustomerInfo {
-  name: string
-  phone: string
-  address?: string
-  deliveryType: 'delivery' | 'pickup'
+  customerName: string
+  customerPhone: string
+  orderType: 'pickup' | 'delivery'
+  customerAddress?: string
   notes?: string
+  country: 'mx' | 'ar'
+  paymentMethod: 'efectivo' | 'transferencia' | 'qr'
 }
 
 export interface OrderSummary {
@@ -24,13 +26,34 @@ export class WhatsAppFormatter {
     hours: "Lun-Dom: 10:00 AM - 10:00 PM"
   }
 
+  private static readonly BUSINESS_INFO = {
+    mx: {
+      name: "🌭 HotDogs Paradise México",
+      phone: "+52 81 2574 0347",
+      address: "Av. Constitución 123, Centro, Monterrey, NL",
+      hours: "Lun-Dom: 10:00 AM - 10:00 PM",
+      currency: "MXN"
+    },
+    ar: {
+      name: "🌭 HotDogs Paradise Argentina", 
+      phone: "+54 14 1552 3886",
+      address: "Av. Corrientes 1234, Buenos Aires, Argentina",
+      hours: "Lun-Dom: 10:00 AM - 10:00 PM",
+      currency: "ARS"
+    }
+  }
+
   static formatOrderMessage(
     cartItems: CartItem[],
     customerInfo: CustomerInfo,
     orderSummary: OrderSummary
   ): string {
-    const timestamp = new Date().toLocaleString('es-MX', {
-      timeZone: 'America/Mexico_City',
+    const businessInfo = this.BUSINESS_INFO[customerInfo.country]
+    const timeZone = customerInfo.country === 'ar' ? 'America/Argentina/Buenos_Aires' : 'America/Mexico_City'
+    const locale = customerInfo.country === 'ar' ? 'es-AR' : 'es-MX'
+    
+    const timestamp = new Date().toLocaleString(locale, {
+      timeZone,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -38,68 +61,68 @@ export class WhatsAppFormatter {
       minute: '2-digit'
     })
 
-    let message = `🌭 *NUEVO PEDIDO - HotDogs Paradise*\n\n`
+    // Mensaje conversacional y amigable con membrete
+    let message = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
+    message += `🏪 *${businessInfo.name}*\n`
+    message += `📍 ${businessInfo.address}\n`
+    message += `🕐 ${businessInfo.hours}\n`
+    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
 
-    // Customer Information
-    message += `👤 *INFORMACIÓN DEL CLIENTE*\n`
-    message += `• Nombre: ${customerInfo.name}\n`
-    message += `• Teléfono: ${customerInfo.phone}\n`
-    message += `• Tipo: ${customerInfo.deliveryType === 'delivery' ? '🚚 Entrega a domicilio' : '🏪 Recoger en tienda'}\n`
+    message += `¡Hola! 👋 Quiero hacer un pedido por favor 🌭\n\n`
 
-    if (customerInfo.address && customerInfo.deliveryType === 'delivery') {
-      message += `• Dirección: ${customerInfo.address}\n`
+    // Información del cliente de forma natural
+    message += `*Mi información:*\n`
+    message += `• Me llamo: ${customerInfo.customerName}\n`
+    message += `• Mi teléfono: ${customerInfo.customerPhone}\n`
+    
+    if (customerInfo.orderType === 'delivery') {
+      message += `• Quiero que me lo entreguen en: ${customerInfo.customerAddress}\n`
+    } else {
+      message += `• Voy a recogerlo en la tienda 🏪\n`
     }
 
     if (customerInfo.notes) {
-      message += `• Notas: ${customerInfo.notes}\n`
+      message += `• Notas adicionales: ${customerInfo.notes}\n`
     }
 
-    message += `• Fecha: ${timestamp}\n\n`
+    message += `• Método de pago: ${this.formatPaymentMethod(customerInfo.paymentMethod)}\n\n`
 
-    // Order Items
-    message += `🛒 *PRODUCTOS ORDENADOS*\n`
+    // Productos de forma clara
+    message += `*Lo que quiero pedir:*\n`
     cartItems.forEach((item, index) => {
-      message += `\n${index + 1}. *${item.product.name}*\n`
-      message += `   • Cantidad: ${item.quantity}\n`
-      message += `   • Precio unitario: $${item.product.basePrice.toFixed(2)}\n`
+      message += `\n${index + 1}. *${item.quantity}x ${item.product.name}*\n`
+      message += `   Precio: $${item.totalPrice.toFixed(2)}\n`
 
-      // Customizations
+      // Personalizaciones de forma clara
       if (item.customizations && Object.keys(item.customizations).length > 0) {
-        message += `   • Personalización:\n`
+        message += `   Personalizado con:\n`
         Object.entries(item.customizations).forEach(([key, value]) => {
           if (Array.isArray(value) && value.length > 0) {
-            message += `     - ${key}: ${value.join(', ')}\n`
-          } else if (typeof value === 'string' && value) {
-            message += `     - ${key}: ${value}\n`
+            message += `   • ${this.formatCustomizationKey(key)}: ${value.join(', ')}\n`
+          } else if (typeof value === 'string' && value && value !== 'none') {
+            message += `   • ${this.formatCustomizationKey(key)}: ${value}\n`
           }
         })
       }
-
-      message += `   • Subtotal: $${item.totalPrice.toFixed(2)}\n`
     })
 
-    // Order Summary
-    message += `\n💰 *RESUMEN DEL PEDIDO*\n`
+    // Total de forma clara
+    message += `\n*Resumen del pedido:*\n`
     message += `• Subtotal: $${orderSummary.subtotal.toFixed(2)}\n`
-    message += `• IVA (16%): $${orderSummary.tax.toFixed(2)}\n`
+    message += `• IVA: $${orderSummary.tax.toFixed(2)}\n`
 
     if (orderSummary.deliveryFee > 0) {
       message += `• Envío: $${orderSummary.deliveryFee.toFixed(2)}\n`
     } else {
-      message += `• Envío: GRATIS ✅\n`
+      message += `• Envío: GRATIS 🎉\n`
     }
 
-    message += `• *TOTAL: $${orderSummary.total.toFixed(2)} MXN*\n\n`
+    message += `• *TOTAL A PAGAR: $${orderSummary.total.toFixed(2)} ${businessInfo.currency}*\n\n`
 
-    // Instructions
-    message += `📋 *INSTRUCCIONES*\n`
-    message += `Por favor confirma tu pedido y tiempo estimado de ${customerInfo.deliveryType === 'delivery' ? 'entrega' : 'preparación'}.\n\n`
+    // Solicitud amigable
+    message += `¿Podrían confirmarme el pedido y decirme cuánto tiempo tardan en ${customerInfo.orderType === 'delivery' ? 'entregarlo' : 'prepararlo'}? 🤔\n\n`
 
-    message += `🏪 *${this.RESTAURANT_INFO.name}*\n`
-    message += `📍 ${this.RESTAURANT_INFO.address}\n`
-    message += `🕐 ${this.RESTAURANT_INFO.hours}\n\n`
-
-    message += `¡Gracias por elegirnos! 🌭❤️`
+    message += `¡Muchas gracias! 🙏`
 
     return message
   }
@@ -108,8 +131,8 @@ export class WhatsAppFormatter {
     const subtotal = cartItems.reduce((total, item) => total + item.totalPrice, 0)
     const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0)
 
-    // Tax calculation (16% IVA in Mexico)
-    const tax = subtotal * 0.16
+    // Tax calculation (16% IVA in Mexico, 21% IVA in Argentina)
+    const tax = subtotal * 0.16 // Default to Mexico rate
 
     // Delivery fee (free over $200)
     const deliveryFee = subtotal > 200 ? 0 : 35
@@ -138,17 +161,21 @@ export class WhatsAppFormatter {
     }
 
     // Validate customer info
-    if (!customerInfo.name.trim()) {
+    if (!customerInfo.customerName.trim()) {
       errors.push('El nombre es requerido')
     }
 
-    if (!customerInfo.phone.trim()) {
+    if (!customerInfo.customerPhone.trim()) {
       errors.push('El teléfono es requerido')
-    } else if (!/^(\+52\s?)?[0-9]{10}$/.test(customerInfo.phone.replace(/\s/g, ''))) {
-      errors.push('Formato de teléfono inválido (debe ser 10 dígitos)')
+    } else {
+      // Validación básica de teléfono (al menos 8 dígitos)
+      const phoneDigits = customerInfo.customerPhone.replace(/\D/g, '')
+      if (phoneDigits.length < 8) {
+        errors.push('El teléfono debe tener al menos 8 dígitos')
+      }
     }
 
-    if (customerInfo.deliveryType === 'delivery' && !customerInfo.address?.trim()) {
+    if (customerInfo.orderType === 'delivery' && !customerInfo.customerAddress?.trim()) {
       errors.push('La dirección es requerida para entrega a domicilio')
     }
 
@@ -158,17 +185,44 @@ export class WhatsAppFormatter {
     }
   }
 
-  static formatPhoneNumber(phone: string): string {
+  static formatPhoneNumber(phone: string, country: 'mx' | 'ar' = 'mx'): string {
     // Clean phone number
     const cleaned = phone.replace(/\D/g, '')
-
-    // Add Mexico country code if not present
-    if (cleaned.length === 10) {
-      return `+52${cleaned}`
-    } else if (cleaned.length === 12 && cleaned.startsWith('52')) {
-      return `+${cleaned}`
+    
+    // Add country code if not present
+    if (country === 'mx') {
+      if (cleaned.length === 10) {
+        return `+52${cleaned}`
+      } else if (cleaned.length === 12 && cleaned.startsWith('52')) {
+        return `+${cleaned}`
+      }
+    } else if (country === 'ar') {
+      if (cleaned.length === 10) {
+        return `+54${cleaned}`
+      } else if (cleaned.length === 12 && cleaned.startsWith('54')) {
+        return `+${cleaned}`
+      }
     }
 
     return phone // Return original if format is unclear
+  }
+
+  private static formatPaymentMethod(method: string): string {
+    const methods = {
+      efectivo: '💵 Efectivo',
+      transferencia: '🏦 Transferencia bancaria',
+      qr: '📱 Pago con QR'
+    }
+    return methods[method as keyof typeof methods] || method
+  }
+
+  private static formatCustomizationKey(key: string): string {
+    const keys = {
+      size: 'Tamaño',
+      bread: 'Pan',
+      ingredients: 'Ingredientes',
+      sauces: 'Salsas'
+    }
+    return keys[key as keyof typeof keys] || key
   }
 }

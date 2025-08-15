@@ -224,9 +224,7 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                                               <span className="text-sm font-semibold">{option.name}</span>
                                             </div>
                                           </div>
-                                          <div className="text-sm font-bold text-gray-600">
-                                            {option.price > 0 ? `+$${option.price}` : 'Gratis'}
-                                          </div>
+                                         
                                         </button>
                                       )
                                     })}
@@ -268,9 +266,7 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                                               <span className="text-sm font-semibold">{option.name}</span>
                                             </div>
                                           </div>
-                                          <div className="text-sm font-bold text-gray-600">
-                                            {option.price > 0 ? `+$${option.price}` : 'Gratis'}
-                                          </div>
+                                         
                                         </button>
                                       )
                                     })}
@@ -319,9 +315,7 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                                               <span className="text-sm font-semibold">{option.name}</span>
                                             </div>
                                           </div>
-                                          <div className="text-sm font-bold text-gray-600">
-                                            +${option.price}
-                                          </div>
+                                        
                                         </button>
                                       )
                                     })}
@@ -371,9 +365,7 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                                               <span className="text-sm font-semibold">{option.name}</span>
                                             </div>
                                           </div>
-                                          <div className="text-sm font-bold text-gray-600">
-                                            {option.price > 0 ? `+$${option.price}` : 'Gratis'}
-                                          </div>
+                                       
                                         </button>
                                       )
                                     })}
@@ -482,12 +474,9 @@ export function ProductCustomizer({ product, isOpen, onClose }: ProductCustomize
                     </div>
 
                     {/* Footer FIJO con precio y botón */}
-                    <div className="bg-gradient-to-r from-orange-600 to-red-500 p-4 text-white flex-shrink-0 border-t-2 border-orange-400">
+                    <div className="bg-gradient-to-r from-orange-600 to-red-500 p-12 text-white flex-shrink-0 border-t-2 border-orange-400">
                       <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <div className="text-orange-100 text-sm">Precio Total:</div>
-                          <div className="text-2xl font-bold">${totalPrice.toFixed(0)}</div>
-                        </div>
+                       
                       </div>
 
                       <Button

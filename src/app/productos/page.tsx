@@ -5,10 +5,41 @@ import { ProductGrid } from '@/components/business/ProductGrid'
 import { ProductFilters } from '@/components/business/restaurant/ProductFilters'
 import { ProductCustomizer } from '@/components/customizer/ProductCustomizer'
 import { Product } from '@/types/product'
+import { Vertical } from '@/lib/constants/verticals'
 import mockData from '@/data/mock-restaurant.json'
 import WhatsAppMessages from '@/lib/whatsapp/optimized-messages'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
+
+// Función para validar y convertir los datos mock al tipo Product
+// Necesaria porque los archivos JSON no tienen tipos TypeScript y TypeScript
+// no puede verificar que los campos como 'vertical' sean del tipo correcto
+function validateAndTransformProducts(mockProducts: any[]): Product[] {
+  return mockProducts.map(product => {
+    // Validar que el vertical sea válido
+    if (!['restaurant', 'service', 'creative'].includes(product.vertical)) {
+      console.warn(`Producto ${product.id} tiene vertical inválido: ${product.vertical}, usando 'restaurant' por defecto`)
+      product.vertical = 'restaurant'
+    }
+
+    // Validar que el id tenga el formato correcto
+    if (!product.id.startsWith('prod_')) {
+      console.warn(`Producto ${product.id} no tiene formato de id válido`)
+    }
+
+    return {
+      ...product,
+      vertical: product.vertical as Vertical,
+      id: product.id as `prod_${string}`,
+      templateType: product.templateType as any,
+      // Asegurar que los campos opcionales tengan valores por defecto si no están presentes
+      category: product.category || 'Sin categoría',
+      description: product.description || '',
+      customizationSchema: product.customizationSchema || undefined,
+      templateMappings: product.templateMappings || undefined
+    }
+  })
+}
 
 export default function ProductosPage() {
   // State for filters
@@ -16,8 +47,8 @@ export default function ProductosPage() {
   const [isProductCustomizerOpen, setIsProductCustomizerOpen] = useState(false)
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
 
-  // Extraer productos del mock data con type assertion
-  const allProducts = (mockData.products || []) as Product[]
+  // Extraer productos del mock data con validación de tipos
+  const allProducts = validateAndTransformProducts(mockData.products || [])
 
   // Extraer categorías únicas para filtros
   const categories = Array.from(
@@ -29,6 +60,12 @@ export default function ProductosPage() {
     if (!selectedCategory) return allProducts
     return allProducts.filter(product => product.category === selectedCategory)
   }, [allProducts, selectedCategory])
+
+  // Obtener el producto seleccionado (ya validado)
+  const selectedProduct = useMemo(() => {
+    if (!selectedProductId) return null
+    return allProducts.find(p => p.id === selectedProductId) || null
+  }, [selectedProductId, allProducts])
 
   // Función para hacer scroll suave
   const scrollToProducts = () => {
@@ -206,13 +243,15 @@ export default function ProductosPage() {
        
       </main>
 
-
-      {/* ProductCustomizer Modal */}
-      {isProductCustomizerOpen && selectedProductId && (
+      {/* ProductCustomizer Modal - CORREGIDO */}
+      {isProductCustomizerOpen && selectedProduct && (
         <ProductCustomizer
-          product={mockData.products.find(p => p.id === selectedProductId) || null}
+          product={selectedProduct}
           isOpen={isProductCustomizerOpen}
-          onClose={() => setIsProductCustomizerOpen(false)}
+          onClose={() => {
+            setIsProductCustomizerOpen(false)
+            setSelectedProductId(null)
+          }}
         />
       )}
     </div>
